@@ -3,3 +3,7 @@
 build
 dist
 test_caveats.py
+
+# Development
+.vscode
+.idea

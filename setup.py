@@ -1,9 +1,8 @@
 import os
-import sys
 from setuptools import setup
 
 os.environ["QT_PREFERRED_BINDING"] = "None"
-version = __import__("Qt").__wrapper_version__
+version = __import__("Qt").__version__
 
 
 classifiers = [
@@ -32,6 +31,7 @@ setup(
     url="https://github.com/mottosso/Qt",
     license="MIT",
     zip_safe=False,
+    data_files=["LICENSE"],
     py_modules=["Qt"],
-    classifiers=classifiers,
+    classifiers=classifiers
 )
