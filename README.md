@@ -1,7 +1,11 @@
-<img width=260 src=logo.svg>
+<img width=260 src=https://raw.githubusercontent.com/mottosso/Qt.py/master/logo.svg>
 
-[![Build Status](https://travis-ci.org/mottosso/Qt.py.svg?branch=master)](https://travis-ci.org/mottosso/Qt.py) [![PyPI version](https://badge.fury.io/py/Qt.py.svg)](https://pypi.python.org/pypi/Qt.py)
-[![Anaconda-Server Badge](https://anaconda.org/conda-forge/qt.py/badges/version.svg)](https://anaconda.org/conda-forge/qt.py) [![Gitter](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/Qt-py/Lobby?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
+[![Downloads](https://pepy.tech/badge/qt-py)](https://pepy.tech/project/qt-py)
+[![Run Tests](https://github.com/mottosso/Qt.py/actions/workflows/run-tests.yml/badge.svg)](https://github.com/mottosso/Qt.py/actions)
+[![PyPI version](https://badge.fury.io/py/Qt.py.svg)](https://pypi.python.org/pypi/Qt.py)
+[![Anaconda-Server Badge](https://anaconda.org/conda-forge/qt.py/badges/version.svg)](https://anaconda.org/conda-forge/qt.py)
+[![Gitter](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/Qt-py/Lobby?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
+[![Reviewed by Hound](https://img.shields.io/badge/Reviewed_by-Hound-8E64B0.svg)](https://houndci.com)
 
 Qt.py enables you to write software that runs on any of the 4 supported bindings - PySide2, PyQt5, PySide and PyQt4.
 
@@ -11,6 +15,10 @@ Qt.py enables you to write software that runs on any of the 4 supported bindings
 
 | Date     | Version   | Event
 |:---------|:----------|:----------
+| May 2024 | [1.4.1][] | Added support for Qt 6
+| Jan 2024 | [1.3.9][] | Run CI on Github Actions, instead of Travis CI.
+| Sep 2020 | [1.3.0][] | Stability improvements and greater ability for `QtCompat.wrapInstance` to do its job
+| Jun 2019 | [1.2.1][] | Bugfixes and [additional members](https://github.com/mottosso/Qt.py/releases/tag/1.2.0)
 | Jan 2018 | [1.1.0][] | Adds new test suite, new members
 | Mar 2017 | [1.0.0][] | Increased safety, **backwards incompatible**
 | Sep 2016 | [0.6.9][] | Stable release
@@ -24,12 +32,17 @@ Qt.py enables you to write software that runs on any of the 4 supported bindings
 [0.6.9]: https://github.com/mottosso/Qt.py/releases/tag/0.6.9
 [1.0.0]: https://github.com/mottosso/Qt.py/releases/tag/1.0.0
 [1.1.0]: https://github.com/mottosso/Qt.py/releases/tag/1.1.0
+[1.2.1]: https://github.com/mottosso/Qt.py/releases/tag/1.2.1
+[1.3.0]: https://github.com/mottosso/Qt.py/releases/tag/1.3.0
+[1.3.9]: https://github.com/mottosso/Qt.py/releases/tag/1.3.9
+[1.4.0]: https://github.com/mottosso/Qt.py/releases/tag/1.4.1
 
 ##### Guides
 
-- [Developing with Qt.py](https://fredrikaverpil.github.io/2016/07/25/developing-with-qt-py/)
-- [Dealing with Maya 2017 and PySide2](https://fredrikaverpil.github.io/2016/07/25/dealing-with-maya-2017-and-pyside2/)
-- [Vendoring Qt.py](https://fredrikaverpil.github.io/2017/05/04/vendoring-qt-py/)
+- [Qt 6 Transition Guide](#qt-6-transition-guide)
+- [Developing with Qt.py](https://fredrikaverpil.github.io/blog/2016/07/25/developing-with-qtpy/)
+- [Dealing with Maya 2017 and PySide2](https://fredrikaverpil.github.io/blog/2016/07/25/dealing-with-maya-2017-and-pyside2/)
+- [Vendoring Qt.py](https://fredrikaverpil.github.io/blog/2017/05/04/vendoring-qtpy/)
 - [Udemy Course](https://www.udemy.com/python-for-maya/learn/v4/t/lecture/6027394)
 - [PythonBytes #77](https://pythonbytes.fm/episodes/show/77/you-don-t-have-to-be-a-workaholic-to-win) (Starts at 5:00)
 
@@ -54,6 +67,7 @@ Qt.py enables you to write software that runs on any of the 4 supported bindings
 - [Projects using Qt.py](#projects-using-qtpy)
 - [Projects similar to Qt.py](#projects-similar-to-qtpy)
 - [Developer guide](#developer-guide)
+- [Qt 6 transition guide](#qt-6-transition-guide)
 
 <br>
 <br>
@@ -93,7 +107,7 @@ $ conda install qt.py
 ```
 
 - Pro tip: **Never use the latest commit for production**. Instead, use [the latest release](https://github.com/mottosso/Qt.py/releases). That way, when you read bug reports or make one for yourself you will be able to match a version with the problem without which you will not know which fixes apply to you nor would we be able to help you. Installing via pip or conda as above ensures you are provided the latest *stable* release. Unstable releases are suffixed with a `.b`, e.g. `1.1.0.b3`.
-- Pro tip: Supports [vendoring](https://fredrikaverpil.github.io/2017/05/04/vendoring-qt-py/)
+- Pro tip: Supports [vendoring](https://fredrikaverpil.github.io/blog/2017/05/04/vendoring-qtpy/)
 
 <br>
 <br>
@@ -150,6 +164,8 @@ Qt.py also provides compatibility wrappers for critical functionality that diffe
 | `translate(...)`        					| `function`  | Compatibility wrapper around [QCoreApplication.translate][]
 | `wrapInstance(addr=long, type=QObject)`   | `QObject`   | Wrapper around `shiboken2.wrapInstance` and PyQt equivalent
 | `getCppPointer(object=QObject)`           | `long`      | Wrapper around `shiboken2.getCppPointer` and PyQt equivalent
+| `isValid(object=QObject)`                 | `bool`      | Wrapper around `shiboken2.isValid` and PyQt equivalent
+| `dataChanged(topLeft=QModelIndex, bottomRight=QModelIndex, roles=[])` | `None` | Wrapper around `QtCore.QAbstractItemModel.dataChanged.emit`
 
 [QCoreApplication.translate]: https://doc.qt.io/qt-5/qcoreapplication.html#translate
 
@@ -179,11 +195,12 @@ This also covers inconsistencies between bindings. For example PyQt4's QFileDial
 
 These are the publicly facing environment variables that in one way or another affect the way Qt.py is run.
 
-| Variable             | Type  | Description
-|:---------------------|:------|:----------
-| QT_PREFERRED_BINDING | str   | Override order and content of binding to try.
-| QT_VERBOSE           | bool  | Be a little more chatty about what's going on with Qt.py
-| QT_SIP_API_HINT      | int   | Sets the preferred SIP api version that will be attempted to set.
+| Variable                  | Type  | Description
+|:--------------------------|:------|:----------
+| QT_PREFERRED_BINDING_JSON | str   | Override order and content of binding to try. This can apply per Qt.py namespace.
+| QT_PREFERRED_BINDING      | str   | Override order and content of binding to try. Used if QT_PREFERRED_BINDING_JSON does not apply.
+| QT_VERBOSE                | bool  | Be a little more chatty about what's going on with Qt.py
+| QT_SIP_API_HINT           | int   | Sets the preferred SIP api version that will be attempted to set.
 
 <br>
 
@@ -222,11 +239,30 @@ PyQt5
 Constrain available choices and order of discovery by supplying multiple values.
 
 ```bash
-# Try PyQt first and then PySide, but nothing else.
-$ export QT_PREFERRED_BINDING=PyQt:PySide
+# Try PyQt4 first and then PySide, but nothing else.
+$ export QT_PREFERRED_BINDING=PyQt4:PySide
 ```
 
 Using the OS path separator (`os.pathsep`) which is `:` on Unix systems and `;` on Windows.
+
+If you need to control the preferred choice of a specific vendored Qt.py you can use the `QT_PREFERRED_BINDING_JSON` environment variable instead.
+
+```json
+{
+    "Qt":["PyQt5"],
+    "myproject.vendor.Qt":["PyQt5"],
+    "default":["PySide2"]
+}
+```
+
+This json data forces any code that uses `import Qt` or `import myproject.vendor.Qt` to use PyQt5(`from x import Qt` etc works too, this is based on `__name__` of the Qt.py being imported). Any other imports of a Qt module will use the "default" PySide2 only. If `"default"` is not provided or a Qt.py being used does not support `QT_PREFERRED_BINDING_JSON`, `QT_PREFERRED_BINDING` will be respected.
+
+```bash
+# Try PyQt5 first and then PyQt4 for the Qt module name space.
+$ export QT_PREFERRED_BINDING_JSON="{"Qt":["PyQt5","PyQt4"]}"
+# Use PyQt4 for any other Qt module name spaces.
+$ export QT_PREFERRED_BINDING=PySide2
+```
 
 <br>
 
@@ -382,28 +418,33 @@ Send us a pull-request with known problems here!
 Send us a pull-request with your studio here.
 
 - [Atomic Fiction](http://www.atomicfiction.com/)
-- [Industrial Brothers](http://industrialbrothers.com/)
-- [Moonbot Studios](http://moonbotstudios.com/)
-- [Sony Pictures Imageworks](http://www.imageworks.com/)
-- [Colorbleed](http://www.colorbleed.nl/)
-- [Method Studios](http://www.methodstudios.com/)
-- [Framestore](https://framestore.com)
-- [Weta Digital](https://www.wetafx.co.nz/)
-- [Disney Animation](https://www.disneyanimation.com/)
-- [Industriromantik](http://www.industriromantik.se/)
-- [Psyop](http://www.psyop.com/)
-- [ftrack](https://www.ftrack.com/)
-- [Fido](http://fido.se/)
 - [Bläck](http://www.blackstudios.se/)
-- [CGRU](http://cgru.info/)
-- [MPC](http://www.moving-picture.com)
-- [Rising Sun Pictures](https://rsp.com.au)
 - [Blur Studio](http://www.blur.com)
-- [Mikros Image](http://www.mikrosimage.com/)
-- [Mackevision](http://www.mackevision.com/)
-- [Epic Games](https://www.epicgames.com/)
+- [CGRU](http://cgru.info/)
+- [Colorbleed](http://www.colorbleed.nl/)
 - [Digital Domain](https://www.digitaldomain.com/)
+- [Disney Animation](https://www.disneyanimation.com/)
+- [Dreamworks Animation](https://github.com/dreamworksanimation)
+- [Epic Games](https://www.epicgames.com/)
+- [Fido](http://fido.se/)
+- [Framestore](https://framestore.com)
+- [ftrack](https://www.ftrack.com/)
+- [Futureworks](http://futureworks.in/)
+- [Industrial Brothers](http://industrialbrothers.com/)
+- [Industriromantik](http://www.industriromantik.se/)
+- [Mackevision](http://www.mackevision.com/)
+- [Method Studios](http://www.methodstudios.com/)
+- [Mikros Image](http://www.mikrosimage.com/)
+- [Moonbot Studios](http://moonbotstudios.com/)
+- [MPC](http://www.moving-picture.com)
 - [Overmind Studios](https://www.overmind-studios.de/)
+- [Psyop](http://www.psyop.com/)
+- [Raynault VFX](https://www.raynault.com/)
+- [Rising Sun Pictures](https://rsp.com.au)
+- [Rodeo FX](https://www.rodeofx.com/en/)
+- [Sony Pictures Imageworks](http://www.imageworks.com/)
+- [Spin VFX](http://www.spinvfx.com/)
+- [Weta Digital](https://www.wetafx.co.nz/)
 
 Presented at Siggraph 2016, BOF!
 
@@ -417,6 +458,7 @@ Presented at Siggraph 2016, BOF!
 
 Send us a pull-request with your project here.
 
+- [USD Manager](http://www.usdmanager.org)
 - [Cosmos](http://cosmos.toolsfrom.space/)
 - [maya-capture-gui](https://github.com/BigRoy/maya-capture-gui)
 - [pyblish-lite](https://github.com/pyblish/pyblish-lite)
@@ -428,6 +470,8 @@ Send us a pull-request with your project here.
 - [AFANASY](http://cgru.info/afanasy/afanasy)
 - [Syncplay](https://github.com/Syncplay/syncplay)
 - [BlenderUpdater](https://github.com/overmindstudios/BlenderUpdater)
+- [QtPyConvert](https://github.com/DigitalDomain/QtPyConvert)
+- [Pyper](https://gitlab.com/brunoebe/pyper.git)
 
 <br>
 <br>
@@ -444,6 +488,7 @@ Comparison matrix.
 | [QtPy][]      | Scientific    | N/A               | MIT       |      | X         | X      |
 | [pyqode.qt][] | Scientific    | PyQt5             | MIT       | X    |           | X      |
 | [QtExt][]     | Film          | N/A               | N/A       |      | X         |        |
+| [python_qt_binding][] | Robotics | N/A            | BSD       | X    | X        | X       | X
 
 Also worth mentioning, [pyqt4topyqt5](https://github.com/rferrazz/pyqt4topyqt5); a good starting point for transitioning to Qt.py.
 
@@ -453,14 +498,13 @@ Send us a pull-request with your project here.
 [jupyter]: https://github.com/jupyter/qtconsole/blob/master/qtconsole/qt_loaders.py
 [pyqode.qt]: https://github.com/pyQode/pyqode.qt
 [QtExt]: https://bitbucket.org/ftrack/qtext
+[python_qt_binding]: https://github.com/ros-visualization/python_qt_binding
 
 <br>
 <br>
 <br>
 
 ### Developer Guide
-
-- [Chat with us](https://gitter.im/Qt-py/Lobby?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
 
 Tests are performed on each aspect of the shim.
 
@@ -534,8 +578,189 @@ docker run --rm -v %CD%:/Qt.py -e PYTHON=3.6 fredrikaverpil/qt.py:2018
 # OK
 ```
 
-Now both you and Travis are operating on the same assumptions which means that when the tests pass on your machine, they pass on Travis. And everybody wins!
+Now both you and Github Actions are operating on the same assumptions which means that when the tests pass on your machine, they pass on Github Actions. And everybody wins!
 
 For details on the Docker image for testing, see [`DOCKER.md`](DOCKER.md).
 
 See [`CONTRIBUTING.md`](CONTRIBUTING.md) for more of the good stuff.
+
+**Upload to PyPI**
+
+To make a new release onto PyPI, you'll need to be mottosso and type this.
+
+```bash
+cd Qt.py
+python .\setup.py sdist bdist_wheel
+python -m twine upload .\dist\*
+```
+
+<br>
+<br>
+<br>
+
+### Qt 6 Transition Guide
+
+| Replace | With | Notes
+|:--------|:-----|:----------------------------
+| `QFont().setWeight(...)` | `QtCompat.QFont.setWeight(font, ...)`
+| `QFont().setWeight(QFont().Bold)` | `QFont().setWeight(QFont.Bold)` | Instance of class doesn't have the enums, apparently
+| `QEvent().Resize` | `QEvent.Resize` | Instance of class doesn't have the enums, seems to apply overall
+| `QtCore.Qt.MidButton`  | `QtCompat.QtCore.Qt.MidButton`
+| `QLabel.setPixmap(str)` | `QLabel.setPixmap(QPixmap())` | Can't take a string anymore (tested in Maya 2025.0)
+| `QModelIndex.child` | `QModel.index` | This one is apparently from Qt 4 and should not have been in Qt.py to begin with
+| | Submit your known issues here! |
+
+##### Removed Members
+
+Many members were removed from Qt.py due to no longer existing in PySide 6.
+
+> If you find where they went, or think some were removed in error, please submit a pull-request!
+
+```json
+"QtCore": [
+    "QAbstractState",
+    "QAbstractTransition",
+    "QEventTransition",
+    "QFinalState",
+    "QSignalTransition",
+    "QTextCodec",
+    "QTextDecoder",
+    "QTextEncoder",
+    "QtCriticalMsg",
+    "QtDebugMsg",
+    "QtFatalMsg",
+    "QtSystemMsg",
+    "QtWarningMsg",
+    "qChecksum",
+    "QPictureIO",
+],
+"QtMultimedia": [
+    "QAbstractVideoBuffer",
+    "QAbstractVideoSurface",
+    "QAudio",
+    "QAudioDeviceInfo",
+    "QAudioFormat",
+    "QAudioInput",
+    "QAudioOutput",
+    "QVideoFrame",
+    "QVideoSurfaceFormat"
+],
+"QtNetwork": [
+    "QNetworkConfiguration",
+    "QNetworkConfigurationManager",
+    "QNetworkSession",
+],
+"QtOpenGL": [
+    "QGL",
+    "QGLContext",
+    "QGLFormat",
+    "QGLWidget"
+],
+"QtSql": [
+    "QSql",
+    "QSqlDatabase",
+    "QSqlDriver",
+    "QSqlDriverCreatorBase",
+    "QSqlError",
+    "QSqlField",
+    "QSqlIndex",
+    "QSqlQuery",
+    "QSqlQueryModel",
+    "QSqlRecord",
+    "QSqlRelation",
+    "QSqlRelationalDelegate",
+    "QSqlRelationalTableModel",
+    "QSqlResult",
+    "QSqlTableModel"
+],
+"QtSvg": [
+    "QSvgGenerator",
+    "QSvgRenderer",
+],
+"QtWidgets": [
+    "QActionGroup",
+    "QDesktopWidget",
+    "QDirModel",
+    "QKeyEventTransition",
+    "QMouseEventTransition",
+    "QUndoCommand",
+    "QUndoGroup",
+    "QUndoStack",
+],
+"QtX11Extras": [
+    "QX11Info"
+],
+"QtXml": [
+    "QXmlAttributes",
+    "QXmlContentHandler",
+    "QXmlDTDHandler",
+    "QXmlDeclHandler",
+    "QXmlDefaultHandler",
+    "QXmlEntityResolver",
+    "QXmlErrorHandler",
+    "QXmlInputSource",
+    "QXmlLexicalHandler",
+    "QXmlLocator",
+    "QXmlNamespaceSupport",
+    "QXmlParseException",
+    "QXmlReader",
+    "QXmlSimpleReader"
+],
+"QtXmlPatterns": [
+    "QAbstractMessageHandler",
+    "QAbstractUriResolver",
+    "QAbstractXmlNodeModel",
+    "QAbstractXmlReceiver",
+    "QSourceLocation",
+    "QXmlFormatter",
+    "QXmlItem",
+    "QXmlName",
+    "QXmlNamePool",
+    "QXmlNodeModelIndex",
+    "QXmlQuery",
+    "QXmlResultItems",
+    "QXmlSchema",
+    "QXmlSchemaValidator",
+    "QXmlSerializer"
+]
+```
+
+##### Static Members Missing from Instances
+
+An overall change is that instances of classes, like `QFont()` no longer provides access to static members, such as `QFont.Bold`. So things like:
+
+```py
+font = QFont()
+font.setWeight(font.Bold)
+```
+
+Must be replaced with:
+
+```py
+font = QFont()
+font.setWeight(QFont.Bold)
+```
+
+Or:
+
+```py
+font.setWeight(type(font).Bold)
+```
+
+Tedious and seemingly unnecessary.. But there you have it!
+
+##### Notes
+
+Qt.py 1.4.0, released in May 2024, added support for Qt 6 whilst preserving compatibility with Qt 4 and 5. That means that in most cases, code you've already written for Qt 4 or 5 will now continue to work with Qt 6, such as Maya 2025.
+
+However, some changes between 5 and 6 require up-front work by you the developer to make your codebase run on Qt 6 whilst continuing to run on Qt 4 and 5.
+
+The above is what we know, please do submit issues and pull-request with what else you find!
+
+- https://github.com/mottosso/Qt.py/issues/new
+
+**See also**
+
+The official PySide2 to PySide6 transition guide, which is especially helpful since Qt.py is modeled after PySide2.
+
+- https://doc.qt.io/qtforpython-6/gettingstarted/porting_from2.html
